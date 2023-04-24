@@ -1,52 +1,65 @@
 <?php
 
+require "includes/database.php";
+require 'includes/article.php';
+
+$errors = [];
+$title = '';
+$content = '';
+$published_at = '';
+
 if($_SERVER["REQUEST_METHOD"]=="POST"){
     
-    require "includes/database.php";
+    $title = $_POST['title'];
 
-    $sql = "INSERT INTO article (title, content, published_at)
-            VALUES ('" . $_POST['title'] . "','"
-                       . $_POST['content'] . "','"
-                       . $_POST['published_at'] . "')";
+    $content = $_POST['content'];
 
-    var_dump($sql);
-    
-    $results = mysqli_query($conn, $sql);
+    $published_at = $_POST['published_at'];
 
-    if($results === false){
-        echo mysqli_error($conn);
-    }else{
-        $id = mysqli_insert_id($conn);
+    $errors = validateArticle($title, $content, $published_at);
+
+    if(empty($errors)){
+
+        $conn = getDB();
+
+        $sql = "INSERT INTO article (title, content, published_at)
+                VALUES (?, ?, ?)";
+
+        
+        $stmt = mysqli_prepare($conn, $sql);
+
+        if($stmt === false){
+            echo mysqli_error($conn);
+        }else{
+
+            if($published_at == ''){
+                $published_at = null;
+            }
+
+            mysqli_stmt_bind_param($stmt, "sss", $title, $content, $published_at);
+
+            if(mysqli_stmt_execute($stmt)){
+                $id = mysqli_insert_id($conn);
+                header("Location: article.php?id=$id");
+                exit;
+            }else{
+                echo mysqli_stmt_error($stmt);
+            }
+
+            
+        }
     }
 }
-
 ?>
 
 
 
 <?php require "includes/header.php"?>
 
+<a href="index.php">All Articles</a>
+
 <h2>New Article</h2>
 
-<form method="post">
-
-    <div>
-        <label for="title">Title</label>
-        <input name="title" id="title" placeholder="Article Title">
-    </div>
-
-    <div>
-        <label for="content">Content</label>
-        <textarea name="content" rows="4" cols="40" id="content" placeholder="Article Content"></textarea>
-    </div>
-    
-    <div>
-        <label for="published_at">Publication date and time</label>
-        <input type="datetime-local" name="published_at" id="published_at">
-    </div>
-
-    <button>Add</button>
-
-</form>
+<?php require "includes/article-form.php"?>
 
 <?php require "includes/footer.php"?>

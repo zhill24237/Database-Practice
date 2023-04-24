@@ -2,6 +2,8 @@
 
 require "includes/database.php";
 
+$conn = getDB();
+
 $sql = "SELECT *
         FROM article
         ORDER BY published_at;";
@@ -18,6 +20,8 @@ if($results === false){
 
 <?php require "includes/header.php"?>     
 
+<a href="new-article.php">New Article</a>
+
     <?php if(empty($articles)):?>
         <p>No articles found.</p>
     <?php else: ?>
@@ -25,8 +29,8 @@ if($results === false){
         <?php foreach($articles as $articles): ?>
             <li>
                 <article>
-                    <h2><a href="article.php?id=<?= $articles['id'];?>"><?= $articles['title'];?></a></h2>
-                    <p><?= $articles['content'];?></p>
+                    <h2><a href="article.php?id=<?= $articles['id'];?>"><?= htmlspecialchars($articles['title']);?></a></h2>
+                    <p><?= htmlspecialchars($articles['content']);?></p>
                 </article>
             </li>
         <?php endforeach?>

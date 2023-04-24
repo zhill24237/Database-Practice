@@ -1,19 +1,14 @@
 <?php 
 
 require "includes/database.php";
+require "includes/article.php";
 
-if(isset($_GET['id']) && is_numeric($_GET['id'])){
-    $sql = "SELECT *
-    FROM article
-    WHERE id = " . $_GET['id'];
+$conn = getDB();
 
-    $results = mysqli_query($conn, $sql);
+if(isset($_GET['id'])){
+    
+    $article = getArticle($conn, $_GET['id']);
 
-    if($results === false){
-        echo mysqli_error($conn);
-    }else{
-        $article = mysqli_fetch_assoc($results);
-    }
 }else{
     $article = null;
 }
@@ -23,6 +18,8 @@ if(isset($_GET['id']) && is_numeric($_GET['id'])){
 ?>
 
 <?php require "includes/header.php"?>
+
+<a href="index.php">All Articles</a>
 
             <?php if($article === null):?>
                 <p>No articles found.</p>
