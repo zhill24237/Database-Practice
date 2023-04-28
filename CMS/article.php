@@ -1,4 +1,4 @@
-<?php 
+<?php  
 
 require "includes/database.php";
 require "includes/article.php";
@@ -25,9 +25,12 @@ if(isset($_GET['id'])){
                 <p>No articles found.</p>
             <?php else: ?>
                 <article>
-                    <h2><?= $article['title'];?></h2>
-                    <p><?= $article['content'];?></p>
+                    <h2><?= htmlspecialchars($article['title']);?></h2>
+                    <p><?= htmlspecialchars($article['content']);?></p>
                 </article>
+
+                <a href="edit-article.php?id=<?=$article['id'];?>">Edit</a>
+                <a href="delete-article.php?id=<?=$article['id'];?>">Delete</a>
             <?php endif?>
 
 <?php require "includes/footer.php"?>

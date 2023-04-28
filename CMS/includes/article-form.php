@@ -16,12 +16,7 @@
         <label for="content">Content</label>
         <textarea name="content" rows="4" cols="40" id="content" placeholder="Article Content"><?=htmlspecialchars($content);?></textarea>
     </div>
-    
-    <div>
-        <label for="published_at">Publication date and time</label>
-        <input type="datetime-local" name="published_at" id="published_at" value="<?=htmlspecialchars($published_at);?>">
-    </div>
 
     <button>Save</button>
 
-</form>
+</form>             

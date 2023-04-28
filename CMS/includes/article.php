@@ -5,11 +5,12 @@
  *
  * @param object $conn Connection to the database
  * @param integer $id the article ID
+ * @param string $columns Optional list of columns for the select, defaults to *
  * 
  * @return mixed An associative array containing the article with that ID, or null if not found 
  */
-function getArticle($conn, $id){
-    $sql = "SELECT *
+function getArticle($conn, $id, $columns = '*'){
+    $sql = "SELECT $columns
             FROM article
             WHERE id = ?";
 
@@ -33,12 +34,11 @@ function getArticle($conn, $id){
  * 
  * @param string $title Title, required
  * @param string $content Content, required
- * @param string $published_at Published date and time, yyyy-mm-dd hh:mm:ss if not blank
  * 
  * @return array An array of validation error messages
  */
 
-function validateArticle($title, $content, $published_at){
+function validateArticle($title, $content){
     
     $errors = [];
 
@@ -48,19 +48,7 @@ function validateArticle($title, $content, $published_at){
         if($content == ''){
             $errors[] = "Content is required";
         }
-        if($published_at !== ''){
-            $date_time = date_create_from_format("M-d-y H:i", $published_at);
-    
-            if($date_time == false){
-                $errors[] = "Invalid date and time.";
-            }else{
-                $date_errors = date_get_last_errors();
-    
-                if($date_errors['warning count'] > 0){
-                    $errors[] = "Invalid date and time.";
-                }
-            }
-        }
+        
 
     return $errors;
 }
