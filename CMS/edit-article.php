@@ -1,22 +1,18 @@
 <?php 
 
-require "includes/database.php";
-require "includes/article.php";
+require "classes/Database.php";
+require 'classes/Article.php';
 require "includes/url.php";
 
-$conn = getDB();
+$db = new Database();
+$conn = $db->getConn();
 
 if(isset($_GET['id'])){
     
-    $article = getArticle($conn, $_GET['id']);
+    $article = Article::getByID($conn, $_GET['id']);
 
-    if($article){
-        $id = $article['id'];
-        $title = $article['title'];
-        $content = $article['content'];
-        $published_at = $article['published_at'];
-    }else{
-        die("article not found");
+    if(! $article){
+        die("Article Not Found");
     }
     
 
@@ -28,34 +24,14 @@ if(isset($_GET['id'])){
 
 if($_SERVER["REQUEST_METHOD"]=="POST"){
     
-    $title = $_POST['title'];
-    $content = $_POST['content'];
+    $article->title = $_POST['title'];
+    $article->content = $_POST['content'];
 
-    $errors = validateArticle($title, $content);
-
-    if(empty($errors)){
-
-        $conn = getDB();
-
-        $sql = "UPDATE article
-                SET title = ?,
-                    content = ?
-                WHERE id = ?";
-
-        
-        $stmt = mysqli_prepare($conn, $sql);
-
-        if($stmt === false){
-            echo mysqli_error($conn);
-        }else{
-
-            mysqli_stmt_bind_param($stmt, "ssi", $title, $content,$id);
-
-            redirect("/CMS/article.php?id=$id");
-
-            
-        }
+    if($article->update($conn)){
+        redirect("/CMS/article.php?id={$article->id}");
     }
+        
+    
 }
 ?>
 

@@ -1,7 +1,7 @@
 <?php
 
-require "includes/database.php";
-require 'includes/article.php';
+require "classes/Database.php";
+require 'classes/Article.php';
 require 'includes/url.php';
 require 'includes/auth.php';
 
@@ -11,46 +11,18 @@ if(!isLoggedIn()){
     die("unauthorised");
 }
 
-$errors = [];
-$title = '';
-$content = '';
-$published_at = '';
+$article = new Article();
 
 if($_SERVER["REQUEST_METHOD"]=="POST"){
     
-    
-    $title = $_POST['title'];
-    $content = $_POST['content'];
+    $db = new Database();
+    $conn = $db->getConn();
 
+    $article->title = $_POST['title'];
+    $article->content = $_POST['content'];
 
-    $errors = validateArticle($title, $content);
-
-    if(empty($errors)){
-
-        $conn = getDB();
-
-
-        $sql = "INSERT INTO article (title, content, published_at)
-                VALUES (?, ?, 
-                NOW())";
-
-        
-        $stmt = mysqli_prepare($conn, $sql);
-
-        if($stmt === false){
-            echo mysqli_error($conn);
-        }else{
-            
-            mysqli_stmt_bind_param($stmt, "ss", $title, $content);
-            if(mysqli_stmt_execute($stmt)){
-                $id = mysqli_insert_id($conn);
-                redirect("/CMS/article.php?id=$id");
-            }else{
-                echo mysqli_stmt_error($stmt);
-            }
-            
-
-        }
+    if($article->create($conn)){
+        redirect("/CMS/article.php?id={$article->id}");
     }
 }
 ?>
