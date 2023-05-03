@@ -1,25 +1,15 @@
 <?php 
 
-require "classes/Database.php";
-require 'classes/Article.php';
-require 'includes/auth.php';
+require 'includes/init.php';
 
-session_start();
+$conn = require 'includes/db.php';
 
-$db = new Database();
-$conn = $db->getConn();
+$paginator = new Paginator($_GET['page'] ?? 1, 4, Article::getTotal($conn));
 
-$articles = Article::getAll($conn);
+$articles = Article::getPage($conn, $paginator->limit, $paginator->offset);
 ?>
 
 <?php require "includes/header.php"?>     
-
-<?php if(isLoggedIn()):?>
-    <p>You are logged in. <a href="logout.php">Log Out</a></p>
-    <p><a href="new-article.php">New Article</a></p>
-<?php else:?>
-    <p>You are logged out. <a href="login.php">Log In</a></p>
-<?php endif; ?>
 
 
     <?php if(empty($articles)):?>
@@ -35,6 +25,9 @@ $articles = Article::getAll($conn);
             </li>
         <?php endforeach?>
     </ul>
+
+    <?php require 'includes/pagination.php';?>
+
     <?php endif?>
 
 <?php require "includes/footer.php"?>
